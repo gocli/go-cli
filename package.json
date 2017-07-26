@@ -1,0 +1,29 @@
+{
+  "name": "go-cli",
+  "version": "0.0.0",
+  "description": "The CLI tool to use boilerplates made with go library",
+  "main": "index.js",
+  "bin": {
+    "go": "bin/go.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/termosa/go-cli.git"
+  },
+  "keywords": [
+    "go",
+    "boilerplate",
+    "template",
+    "cli",
+    "generator"
+  ],
+  "author": "Stanislav Termosa <termosa.stanislav@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/termosa/go/issues"
+  },
+  "homepage": "https://github.com/termosa/go#readme"
+}
