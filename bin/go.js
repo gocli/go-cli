@@ -12,6 +12,7 @@ var exec = require('shelljs').exec
 var findNextGoBinary = require('../lib/find-next-go-binary')
 
 var ERROR_CODE = 1
+var GO_SUBCOMMAND_NOT_FOUND_CODE = 2 // If it was go-lang, but how do we know?
 var COMMAND_NOT_FOUND_CODE = 44
 
 function triggerError (msg, code) {
@@ -39,11 +40,15 @@ var exitCode = exec(shellCommand, { cwd: path.dirname(goConfigFile) }).code
 
 if (exitCode === COMMAND_NOT_FOUND_CODE) {
   var binary = findNextGoBinary()
-  if (!binary) {
-    return triggerError('unknown command was triggered: go ' + argsString, exitCode)
+  if (binary) {
+    var res = exec([binary, argsString].join(' '), { silent: true })
+    if (res.code !== GO_SUBCOMMAND_NOT_FOUND_CODE) {
+      if (res.stdout) console.log(res.stdout)
+      if (res.stderr) console.error(res.stderr)
+      return process.exit(exitCode)
+    }
   }
-  exitCode = exec([binary, argsString].join(' ')).code
-  return process.exit(exitCode)
+  return triggerError('unknown command was triggered: go ' + argsString, exitCode)
 }
 
 if (exitCode) triggerError('excution has failed', exitCode)
