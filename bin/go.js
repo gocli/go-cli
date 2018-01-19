@@ -3,52 +3,85 @@
 /*
  * TODO:
  * - all commands should be registered with information that will be used to generate HELP output
- * - after loading template the default command should be runned if it is presented
+ * - after loading template the default command should be runned if it is presented (using .goconfig file)
+ * - add help output
+ * - add completions
  */
 
 var fs = require('fs')
-var path = require('path')
-var exec = require('shelljs').exec
-var findNextGoBinary = require('../lib/find-next-go-binary')
+var Liftoff = require('liftoff')
+var minimist = require('minimist')
+var interpret = require('interpret')
 
-var ERROR_CODE = 1
-var GO_SUBCOMMAND_NOT_FOUND_CODE = 2 // If it was go-lang, but how do we know?
-var COMMAND_NOT_FOUND_CODE = 44
+var OK = 0
+var ERROR = 1
 
-function triggerError (msg, code) {
-  if (!code) code = ERROR_CODE
-  console.error('Go [error]:', msg)
-  process.exit(ERROR_CODE)
-}
+var args = process.argv.slice(2)
+var argv = minimist(args)
 
-var goConfigFile = require('../lib/find-goconfig')()
-if (!goConfigFile) {
-  return triggerError('go.config.js file is not found in current and parent folders')
-}
+var Cli = new Liftoff({
+  name: 'go',
+  processTitle: ['go'].concat(args).join(' '),
+  extensions: interpret.jsVariants
+})
 
-var argsString = process.argv.slice(2).join(' ')
+Cli.launch({
+  cwd: argv.cwd,
+  configPath: argv.myappfile,
+  require: argv.require,
+  completion: argv.completion
+}, execute)
 
-var entryScript = fs.readFileSync(path.resolve(__dirname, '../scripts/run-goconfig.js'))
-  .toString()
-  .replace(/%gocli-dir%/g, path.resolve(__dirname, '..'))
-  .replace(/%goconfig-file%/g, goConfigFile)
-  // TODO: Make sure ' and " works fine after replacing
-  .replace(/%command%/g, argsString)
+function execute (env) {
+  if (!args[0]) exit('Help is not ready yet', ERROR)
 
-var shellCommand = 'node -e "' + entryScript + '"'
-var exitCode = exec(shellCommand, { cwd: path.dirname(goConfigFile) }).code
-
-if (exitCode === COMMAND_NOT_FOUND_CODE) {
-  var binary = findNextGoBinary()
-  if (binary) {
-    var res = exec([binary, argsString].join(' '), { silent: true })
-    if (res.code !== GO_SUBCOMMAND_NOT_FOUND_CODE) {
-      if (res.stdout) console.log(res.stdout)
-      if (res.stderr) console.error(res.stderr)
-      return process.exit(exitCode)
+  if (args[0] && args[0].indexOf(':') === 0) {
+    var command = args[0].match(/^:([\w]+)(:(.*))?$/)
+    var loaderName = command[1]
+    var source = command[3]
+    var loader = getLoader(loaderName)
+    if (loader) {
+      loader(source, argv)
+        .then(function (destination) {
+          exit('project is deployed to the directory \`' + destination + '\`')
+        })
+        .catch(function(error) {
+          exit(error, ERROR)
+        })
+    } else {
+      exit(loaderName + ' loader is not registered', ERROR)
     }
+    return
   }
-  return triggerError('unknown command was triggered: go ' + argsString, exitCode)
+
+  if (!env.modulePath) exit('go package is not installed', ERROR)
+  if (!env.configPath) exit('Gofile is not found', ERROR)
+
+  var go = require(env.modulePath)
+  go.use(require('../plugin'))
+  require(env.configPath)
+  go.executeCommand(args.join(' '))
+    .then(function (result) {
+      if (result) exit(result)
+    })
+    .catch(function (error) {
+      exit(error, ERROR)
+    })
 }
 
-if (exitCode) triggerError('excution has failed', exitCode)
+function getLoader (name) {
+  try {
+    return require('../loaders/' + name)
+  } catch (err) {
+    return null
+  }
+}
+
+function exit (message, code) {
+  if (typeof code === 'undefined') code = OK
+  if (message) {
+    if (code === OK) console.log('[Go]:', message)
+    else console.error('[Go] error:', message)
+  }
+  process.exit(code)
+}

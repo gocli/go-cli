@@ -2,7 +2,6 @@
   "name": "go-cli",
   "version": "0.0.0",
   "description": "The CLI tool to use boilerplates made with go library",
-  "main": "index.js",
   "bin": {
     "go": "bin/go.js"
   },
@@ -28,8 +27,8 @@
   "homepage": "https://github.com/termosa/go#readme",
   "dependencies": {
     "download-github-repo": "0.1.3",
-    "findup-sync": "2.0.0",
-    "shelljs": "0.8.0",
-    "yargs": "10.1.1"
+    "interpret": "1.1.0",
+    "liftoff": "2.5.0",
+    "minimist": "1.2.0"
   }
 }
