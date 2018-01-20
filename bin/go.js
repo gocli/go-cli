@@ -36,35 +36,28 @@ function execute (env) {
   if (!args[0]) exit('Help is not ready yet', ERROR)
 
   if (args[0] && args[0].indexOf(':') === 0) {
-    var command = args[0].match(/^:([\w]+)(:(.*))?$/)
-    var loaderName = command[1]
-    var source = command[3]
-    var loader = getLoader(loaderName)
-    if (loader) {
-      loader(source, argv)
-        .then(function (destination) {
-          exit('project is deployed to the directory \`' + destination + '\`')
-        })
-        .catch(function(error) {
-          exit(error, ERROR)
-        })
-    } else {
-      exit(loaderName + ' loader is not registered', ERROR)
-    }
-    return
+    return executeInnerCommand(argv)
   }
 
   if (!env.modulePath) exit('go package is not installed', ERROR)
   if (!env.configPath) exit('Gofile is not found', ERROR)
 
-  var go = require(env.modulePath)
-  go.use(require('../plugin'))
-  require(env.configPath)
-  go.executeCommand(args.join(' '))
-    .then(function (result) {
-      if (result) exit(result)
+  executeLocalCommand(env.modulePath, env.configPath, argv)
+}
+
+function executeInnerCommand (argv) {
+  var command = argv._[0].match(/^:([\w]+)(:(.*))?$/)
+  var loaderName = command[1]
+  var source = command[3]
+  var loader = getLoader(loaderName)
+
+  if (!loader) exit(loaderName + ' loader is not registered', ERROR)
+
+  loader(source, argv)
+    .then(function (destination) {
+      exit('project is deployed to the directory \`' + destination + '\`')
     })
-    .catch(function (error) {
+    .catch(function(error) {
       exit(error, ERROR)
     })
 }
@@ -75,6 +68,19 @@ function getLoader (name) {
   } catch (err) {
     return null
   }
+}
+
+function executeLocalCommand (modulePath, configPath, argv) {
+  var go = require(modulePath)
+  go.use(require('../plugin'))
+  require(configPath)
+  go.executeCommand(argv._.join(' '))
+    .then(function (result) {
+      if (result) exit(result)
+    })
+    .catch(function (error) {
+      exit(error, ERROR)
+    })
 }
 
 function exit (message, code) {

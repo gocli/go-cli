@@ -13,11 +13,13 @@
     "url": "git+https://github.com/termosa/go-cli.git"
   },
   "keywords": [
-    "go",
     "boilerplate",
+    "automation",
     "template",
+    "generator",
+    "scaffold",
     "cli",
-    "generator"
+    "go"
   ],
   "author": "Stanislav Termosa <termosa.stanislav@gmail.com>",
   "license": "MIT",

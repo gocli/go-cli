@@ -1,7 +1,7 @@
 var minimist = require('minimist')
 
 function normalizeCommand (command) {
-  if (typeof command == 'string') return command
+  if (typeof command == 'string') return '^' + command + '$'
   if (command instanceof RegExp) return command.toString().slice(1, -1)
 
   return false
