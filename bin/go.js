@@ -1,12 +1,5 @@
 #!/usr/bin/env node
 
-/*
- * TODO:
- * - all commands should be registered with information that will be used to generate HELP output
- * - add help output
- * - add completions
- */
-
 var fs = require('fs')
 var spawn = require('child_process').spawn
 var Liftoff = require('liftoff')
@@ -16,6 +9,7 @@ var interpret = require('interpret')
 var OK = 0
 var ERROR = 1
 var CONFIG_FILE = '.goconfig'
+var DEFAULT_LOADER = 'github'
 
 var args = process.argv.slice(2)
 var argv = minimist(args, {
@@ -53,7 +47,7 @@ function isInnerCommand (argv) {
 }
 
 function executeInnerCommand (argv) {
-  var command = argv._[0].match(/^:([\w]+)(:(.*))?$/)
+  var command = argv._[0].match(/^:([\w]+)?(:(.*))?$/)
   var loaderName = command[1]
   var source = command[3]
   var loader = getLoader(loaderName)
@@ -75,6 +69,7 @@ function executeInnerCommand (argv) {
 }
 
 function getLoader (name) {
+  if (!name) name = DEFAULT_LOADER
   try {
     return require('../loaders/' + name)
   } catch (err) {
@@ -86,7 +81,8 @@ function installTemplate (destination) {
   return new Promise(function (resolve, reject) {
     var configPath = destination + '/' + CONFIG_FILE
 
-    if (!fs.statSync(configPath)) return resolve('file not found')
+    try { fs.statSync(configPath) }
+    catch (o_O) { resolve(CONFIG_FILE + ' not found') }
 
     try {
       var config = require(configPath)
