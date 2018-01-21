@@ -5,6 +5,7 @@ var spawn = require('child_process').spawn
 var Liftoff = require('liftoff')
 var minimist = require('minimist')
 var interpret = require('interpret')
+var which = require('shelljs').which
 
 var OK = 0
 var ERROR = 1
@@ -41,10 +42,11 @@ function execute (env) {
 
   var go = loadGo(env)
   var command = args.join(' ')
-  if (go.validateCommand(command)) {
-    executeLocalCommand(command, env)
-  } else {
+  if (!go.validateCommand(command) && getExternalBinary()) {
+    log('command \`' + argv._[0] + '\` is not matched, falling back to next binary: ' + getExternalBinary())
     executeExternalBinary(command)
+  } else {
+    executeLocalCommand(command, env)
   }
 }
 
@@ -129,15 +131,38 @@ function loadGo (env) {
   return loadGo.instance
 }
 
+function getExternalBinary () {
+  if (!getExternalBinary.instance) {
+    var goBinaries = which('-a', 'go')
+    getExternalBinary.instance = goBinaries[1] || null
+  }
+  return getExternalBinary.instance
+}
+
 function executeExternalBinary (command) {
-  console.log('Running: $ go', command)
+  var bin = getExternalBinary()
+  spawn(bin + ' ' + command, { stdio: 'inherit', shell: true })
+    .on('error', function (error) {
+      exit(error, ERROR)
+    })
+    .on('exit', function (code) {
+      exit(null, code)
+    })
+}
+
+function log (message) {
+  console.log('[Go]:', message)
+}
+
+function logError (message) {
+  console.error('[Go] error:', message)
 }
 
 function exit (message, code) {
   if (typeof code === 'undefined') code = OK
   if (message) {
-    if (code === OK) console.log('[Go]:', message)
-    else console.error('[Go] error:', message)
+    if (code === OK) log(message)
+    else logError(message)
   }
   process.exit(code)
 }
