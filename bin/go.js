@@ -39,7 +39,13 @@ function execute (env) {
   if (!env.modulePath) exit('go package is not installed', ERROR)
   if (!env.configPath) exit('Gofile is not found', ERROR)
 
-  executeLocalCommand(env.modulePath, env.configPath, argv)
+  var go = loadGo(env)
+  var command = args.join(' ')
+  if (go.validateCommand(command)) {
+    executeLocalCommand(command, env)
+  } else {
+    executeExternalBinary(command)
+  }
 }
 
 function isInnerCommand (argv) {
@@ -102,17 +108,29 @@ function installTemplate (destination) {
   })
 }
 
-function executeLocalCommand (modulePath, configPath, argv) {
-  var go = require(modulePath)
-  go.use(require('../plugin'))
-  require(configPath)
-  go.executeCommand(argv._.join(' '))
+function executeLocalCommand (command, env) {
+  var go = loadGo(env)
+  go.executeCommand(command)
     .then(function (result) {
       if (result) exit(result)
     })
     .catch(function (error) {
       exit(error, ERROR)
     })
+}
+
+function loadGo (env) {
+  if (!loadGo.instance) {
+    var go = require(env.modulePath)
+    go.use(require('../plugin'))
+    require(env.configPath)
+    loadGo.instance = go
+  }
+  return loadGo.instance
+}
+
+function executeExternalBinary (command) {
+  console.log('Running: $ go', command)
 }
 
 function exit (message, code) {

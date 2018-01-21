@@ -14,26 +14,25 @@ function showWarning (msg) {
 function installPlugin (proto) {
   var commands = {}
 
+  proto.validateCommand = function validateCommand (commandRequest) {
+    if (typeof commandRequest !== 'string') {
+      throw new TypeError('`commandRequest` should be a string')
+    }
+
+    return !!matchCommand(commandRequest)
+  }
+
   proto.executeCommand = function executeCommand (commandRequest) {
     if (typeof commandRequest !== 'string') {
       throw new TypeError('`commandRequest` should be a string')
     }
 
-    var argv = minimist(commandRequest.trim().split(/\s+/g))
-    var triggeredCommand = argv._[0]
-    var tests = Object.keys(commands)
-    var index = tests.length
-    while (index--) {
-      var selector = new RegExp(tests[index])
-      if (selector.test(triggeredCommand)) break
-    }
+    var argv = parseCommand(commandRequest)
+    var command = matchCommand(commandRequest)
 
-    if (!~index) {
-      return Promise.reject('command \`' + triggeredCommand + '\` is not registered')
+    if (!command) {
+      return Promise.reject('command \`' + argv._[0] + '\` is not registered')
     }
-
-    var commandIndex = tests[index]
-    var command = commands[commandIndex]
 
     return Promise.resolve(command.callback.call(proto, argv, command.options))
   }
@@ -79,6 +78,28 @@ function installPlugin (proto) {
     }
 
     return proto
+  }
+
+  function matchCommand (commandRequest) {
+    var argv = parseCommand(commandRequest)
+    var triggeredCommand = argv._[0]
+    var tests = Object.keys(commands)
+    var index = tests.length
+    while (index--) {
+      var selector = new RegExp(tests[index])
+      if (selector.test(triggeredCommand)) break
+    }
+
+    if (!~index) return null
+
+    var commandIndex = tests[index]
+    var command = commands[commandIndex]
+
+    return command
+  }
+
+  function parseCommand (commandRequest) {
+    return minimist(commandRequest.trim().split(/\s+/g))
   }
 }
 
