@@ -1,6 +1,6 @@
 {
   "name": "go-cli",
-  "version": "0.0.0",
+  "version": "1.0.0-rc.0",
   "description": "The CLI tool to use boilerplates made with go library",
   "bin": {
     "go": "bin/go.js"
