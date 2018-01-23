@@ -6,6 +6,8 @@ var Liftoff = require('liftoff')
 var minimist = require('minimist')
 var interpret = require('interpret')
 var which = require('shelljs').which
+var sep = require('path').sep
+var pathResolve = require('path').resolve
 
 var OK = 0
 var ERROR = 1
@@ -79,7 +81,7 @@ function executeInnerCommand (argv) {
 function getLoader (name) {
   if (!name) name = DEFAULT_LOADER
   try {
-    return require('../loaders/' + name)
+    return require('..' + sep + 'loaders' + sep + name)
   } catch (err) {
     return null
   }
@@ -87,7 +89,7 @@ function getLoader (name) {
 
 function installTemplate (destination) {
   return new Promise(function (resolve, reject) {
-    var configPath = destination + '/' + CONFIG_FILE
+    var configPath = pathResolve('.' + sep + destination + sep + CONFIG_FILE)
 
     try { fs.statSync(configPath) }
     catch (o_O) { resolve(CONFIG_FILE + ' not found') }
@@ -124,7 +126,7 @@ function executeLocalCommand (command, env) {
 function loadGo (env) {
   if (!loadGo.instance) {
     var go = require(env.modulePath)
-    go.use(require('../plugin'))
+    go.use(require('..' + sep + 'plugin'))
     require(env.configPath)
     loadGo.instance = go
   }

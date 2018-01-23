@@ -1,4 +1,4 @@
-# go <sub><sup><sub>with ease</sub></sup></sub>
+# go-cli
 
 The CLI tool to use boilerplates made with [go](https://www.npmjs.com/package/go)
 
