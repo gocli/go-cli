@@ -33,22 +33,34 @@ Cli.launch({
 }, execute)
 
 function execute (env) {
-  if (!argv._[0]) exit('Help is not ready yet', ERROR)
-
   if (isInnerCommand(argv)) {
     return executeInnerCommand(argv)
   }
 
-  if (!env.modulePath) exit('go package is not installed', ERROR)
-  if (!env.configPath) exit('Gofile is not found', ERROR)
-
-  var go = loadGo(env)
   var command = args.join(' ')
-  if (!go.validateCommand(command) && getExternalBinary()) {
-    log('command \`' + argv._[0] + '\` is not matched, falling back to next binary: ' + getExternalBinary())
-    executeExternalBinary(command)
+  if (env.configPath) {
+    if (!env.modulePath) {
+      if (getExternalBinary()) {
+        log('go package is not installed, falling back to next binary: ' + getExternalBinary())
+        executeExternalBinary(command)
+      } else {
+        exit('go package is not installed', ERROR)
+      }
+    } else {
+      var go = loadGo(env)
+      if (!go.validateCommand(command) && getExternalBinary()) {
+        log('command \'' + argv._[0] + '\' is not matched, falling back to next binary: ' + getExternalBinary())
+        executeExternalBinary(command)
+      } else {
+        executeLocalCommand(command, env)
+      }
+    }
   } else {
-    executeLocalCommand(command, env)
+    if (getExternalBinary()) {
+      executeExternalBinary(command)
+    } else {
+      exit('Gofile is not found', ERROR)
+    }
   }
 }
 

@@ -31,7 +31,7 @@ function installPlugin (proto) {
     var command = matchCommand(commandRequest)
 
     if (!command) {
-      return Promise.reject('command \`' + argv._[0] + '\` is not registered')
+      return Promise.reject('command \'' + argv._[0] + '\' is not registered')
     }
 
     return Promise.resolve(command.callback.call(proto, argv, command.options))
