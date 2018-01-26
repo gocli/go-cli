@@ -1,6 +1,6 @@
 var download = require('download-github-repo')
 
-var repositoryRegexp = /^[-\w]+\/[-\w]+$/
+var repositoryRegexp = /^[-\w]+\/[-\w]+(#[^^~:\s\\]+)?$/
 
 function loadGithubRepository (repository, argv) {
   return new Promise(function (resolve, reject) {
