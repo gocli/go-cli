@@ -6,13 +6,13 @@ var Liftoff = require('liftoff')
 var minimist = require('minimist')
 var interpret = require('interpret')
 var which = require('shelljs').which
-var sep = require('path').sep
-var pathResolve = require('path').resolve
+var resolvePath = require('path').resolve
+var joinPath = require('path').join
+var requireLoader = require('../lib/require-loader')
 
 var OK = 0
 var ERROR = 1
 var CONFIG_FILE = '.goconfig'
-var DEFAULT_LOADER = 'github'
 
 var args = process.argv.slice(2)
 var argv = minimist(args, {
@@ -71,37 +71,45 @@ function isInnerCommand (argv) {
 function executeInnerCommand (argv) {
   var command = argv._[0].match(/^:([\w]+)?(:(.*))?$/)
   var loaderName = command[1]
-  var source = command[3]
-  var loader = getLoader(loaderName)
+  var prefix = command[3]
 
-  if (!loader) exit(loaderName + ' loader is not registered', ERROR)
+  try {
+    var loader = requireLoader(loaderName)
+  } catch (error) {
+    exit(error, ERROR)
+  }
 
-  return loader(source, argv)
-    .then(function (destination) {
+  if (!loader) {
+    var message = loaderName + ' loader is missing.\n'
+      + 'Try to install it:\n'
+      + ' $ npm i -g ' + requireLoader.normalizeName(loaderName)
+    exit(message, ERROR)
+  }
+
+  if (typeof loader !== 'function' && typeof loader.execute !== 'function') {
+    exit(requireLoader.normalizeName(loaderName) + ' is not compatible')
+  }
+
+  return (loader.execute || loader)(argv, prefix)
+    .then(function (result) {
+      var path = result && result.path
+
       function finish () {
-        exit('project is deployed to the directory \`' + destination + '\`')
+        if (!path) exit()
+        exit('project is deployed to the directory \`' + path + '\`')
       }
 
       if (!argv.install) finish()
-      else installTemplate(destination)
+      else installTemplate(path)
         .then(finish)
         .catch(function (error) { exit(error, ERROR) })
     })
     .catch(function(error) { exit(error, ERROR) })
 }
 
-function getLoader (name) {
-  if (!name) name = DEFAULT_LOADER
-  try {
-    return require('..' + sep + 'loaders' + sep + name)
-  } catch (err) {
-    return null
-  }
-}
-
-function installTemplate (destination) {
+function installTemplate (path) {
   return new Promise(function (resolve, reject) {
-    var configPath = pathResolve('.' + sep + destination + sep + CONFIG_FILE)
+    var configPath = resolvePath('.', path, CONFIG_FILE)
 
     try { fs.statSync(configPath) }
     catch (o_O) { resolve(CONFIG_FILE + ' not found') }
@@ -111,7 +119,7 @@ function installTemplate (destination) {
       if (!config) return resolve()
 
       if (config.install) {
-        spawn(config.install, { stdio: 'inherit', shell: true, cwd: destination })
+        spawn(config.install, { stdio: 'inherit', shell: true, cwd: path })
           .on('error', reject)
           .on('exit', function (code) {
             if (code) reject('install command has failed')
@@ -138,7 +146,7 @@ function executeLocalCommand (command, env) {
 function loadGo (env) {
   if (!loadGo.instance) {
     var go = require(env.modulePath)
-    go.use(require('..' + sep + 'plugin'))
+    go.use(require(joinPath('..', 'plugin')))
     require(env.configPath)
     loadGo.instance = go
   }

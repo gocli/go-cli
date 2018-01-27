@@ -28,10 +28,11 @@
   },
   "homepage": "https://github.com/gocli/go#readme",
   "dependencies": {
-    "download-github-repo": "0.1.4",
-    "interpret": "1.1.0",
-    "liftoff": "2.5.0",
-    "minimist": "1.2.0",
-    "shelljs": "0.8.1"
+    "go-loader-git": "^1.0.0",
+    "interpret": "^1.1.0",
+    "liftoff": "^2.5.0",
+    "minimist": "^1.2.0",
+    "resolve-global": "^0.1.0",
+    "shelljs": "^0.8.1"
   }
 }
