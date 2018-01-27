@@ -5,7 +5,7 @@ var spawn = require('child_process').spawn
 var Liftoff = require('liftoff')
 var minimist = require('minimist')
 var interpret = require('interpret')
-var which = require('shelljs').which
+var which = require('which')
 var resolvePath = require('path').resolve
 var joinPath = require('path').join
 var requireLoader = require('../lib/require-loader')
@@ -155,7 +155,7 @@ function loadGo (env) {
 
 function getExternalBinary () {
   if (!getExternalBinary.instance) {
-    var goBinaries = which('-a', 'go')
+    var goBinaries = which.sync('go', { all: true })
     getExternalBinary.instance = goBinaries[1] || null
   }
   return getExternalBinary.instance
