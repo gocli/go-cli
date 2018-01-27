@@ -32,6 +32,8 @@
     "interpret": "1.1.0",
     "liftoff": "2.5.0",
     "minimist": "1.2.0",
-    "shelljs": "0.8.1"
+    "rimraf": "2.6.2",
+    "shelljs": "0.8.1",
+    "vue-cli": "2.9.2"
   }
 }

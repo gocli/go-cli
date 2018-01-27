@@ -79,7 +79,7 @@ function executeInnerCommand (argv) {
   return loader(source, argv)
     .then(function (destination) {
       function finish () {
-        exit('project is deployed to the directory \`' + destination + '\`')
+        log('project is deployed to the directory \`' + destination + '\`')
       }
 
       if (!argv.install) finish()
