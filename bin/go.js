@@ -9,6 +9,9 @@ var which = require('which')
 var resolvePath = require('path').resolve
 var joinPath = require('path').join
 var requireLoader = require('../lib/require-loader')
+var completions = require('../lib/completions')
+var fetchLoaderCommands = require('../lib/fetch-loader-commands')
+var generateCommandsCompletions = require('../lib/generate-commands-completions')
 
 var OK = 0
 var ERROR = 1
@@ -22,17 +25,32 @@ var argv = minimist(args, {
 var Cli = new Liftoff({
   name: 'go',
   processTitle: ['go'].concat(args).join(' '),
-  extensions: interpret.jsVariants
+  extensions: interpret.jsVariants,
+  completions: completions
 })
 
 Cli.launch({
   cwd: argv.cwd,
-  configPath: argv.myappfile,
-  require: argv.require,
+  configPath: argv.config,
   completion: argv.completion
 }, execute)
 
 function execute (env) {
+  if (argv['commands-list']) {
+    var commands = fetchLoaderCommands()
+
+    if (env.configPath && env.modulePath) {
+      try {
+        var go = loadGo(env)
+        commands = commands.concat(go.listCommands())
+      } catch (e) {}
+    }
+
+    var completionsOptions = generateCommandsCompletions(commands)
+    console.log(completionsOptions)
+    process.exit(0)
+  }
+
   if (isInnerCommand(argv)) {
     return executeInnerCommand(argv)
   }

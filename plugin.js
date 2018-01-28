@@ -38,6 +38,7 @@ function installPlugin (proto) {
   }
 
   proto.registerCommand = function registerCommand (selector, optionsOrCallback, callbackOrNothing) {
+    var name = typeof selector === 'string' ? selector : null
     selector = normalizeCommand(selector)
 
     if (!selector) {
@@ -59,7 +60,12 @@ function installPlugin (proto) {
       showWarning('Rewriting exisiting command (' + selector + ')')
     }
 
-    commands[selector] = { options: options, callback: callback, selector: selector }
+    commands[selector] = {
+      options: options,
+      callback: callback,
+      selector: selector,
+      name: name
+    }
 
     return proto
   }
@@ -78,6 +84,20 @@ function installPlugin (proto) {
     }
 
     return proto
+  }
+
+  proto.listCommands = function listCommands () {
+    var keys = Object.keys(commands)
+    var result = []
+    for (var i = 0; i < keys.length; i++) {
+      if (commands[keys[i]].name) {
+        result.push({
+          name: commands[keys[i]].name,
+          description: commands[keys[i]].options.description || ''
+        })
+      }
+    }
+    return result
   }
 
   function matchCommand (commandRequest) {

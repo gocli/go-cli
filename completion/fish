@@ -1,0 +1,10 @@
+#!/usr/bin/env fish
+
+# Usage:
+#
+# To enable fish <tab> completion for go, add the following line to
+# your ~/.config/fish/config.fish file:
+#
+# go --completion=fish | source
+
+complete -c go -a "(go --commands-list)" -f
