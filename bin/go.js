@@ -93,6 +93,7 @@ function executeInnerCommand (argv) {
   return (loader.execute || loader)(argv, prefix)
     .then(function (result) {
       var path = result && result.path
+      if (!path) exit()
 
       function finish () {
         if (!path) exit()
@@ -112,22 +113,18 @@ function installTemplate (path) {
     var configPath = resolvePath('.', path, CONFIG_FILE)
 
     try { fs.statSync(configPath) }
-    catch (o_O) { resolve(CONFIG_FILE + ' not found') }
+    catch (o_O) { resolve() }
 
-    try {
-      var config = require(configPath)
-      if (!config) return resolve()
+    var config = require(configPath)
+    if (!config) return resolve()
 
-      if (config.install) {
-        spawn(config.install, { stdio: 'inherit', shell: true, cwd: path })
-          .on('error', reject)
-          .on('exit', function (code) {
-            if (code) reject('install command has failed')
-            else resolve()
-          })
-      }
-    } catch (err) {
-      reject(err)
+    if (config.install) {
+      spawn(config.install, { stdio: 'inherit', shell: true, cwd: path })
+        .on('error', reject)
+        .on('exit', function (code) {
+          if (code) reject('install command has failed')
+          else resolve()
+        })
     }
   })
 }
