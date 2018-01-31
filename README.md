@@ -2,6 +2,8 @@
 
 The CLI tool to use boilerplates made with [go](https://www.npmjs.com/package/go)
 
+![go-cli example](https://raw.githubusercontent.com/gocli/go-cli/master/docs/example.gif)
+
 ## Usage
 
 This tool can be used for two purposes:
