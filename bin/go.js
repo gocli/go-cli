@@ -145,7 +145,6 @@ function executeLocalCommand (command, env) {
 function loadGo (env) {
   if (!loadGo.instance) {
     var go = require(env.modulePath)
-    go.use(require(joinPath('..', 'plugin')))
     require(env.configPath)
     loadGo.instance = go
   }
