@@ -95,7 +95,8 @@ function executeInnerCommand (argv) {
       var path = result && result.path
       if (!path) exit()
 
-      function finish () {
+      function finish (message) {
+        if (message) console.log('(git) ' + message)
         if (!path) exit()
         exit('project is deployed to the directory \`' + path + '\`')
       }
@@ -113,19 +114,20 @@ function installTemplate (path) {
     var configPath = resolvePath('.', path, CONFIG_FILE)
 
     try { fs.statSync(configPath) }
-    catch (o_O) { resolve() }
+    catch (o_O) {
+      try { fs.statSync(configPath + '.json') }
+      catch (o_O) { return resolve(CONFIG_FILE + '(.json) not found') }
+    }
 
     var config = require(configPath)
-    if (!config) return resolve()
+    if (!config || !config.install) return resolve()
 
-    if (config.install) {
-      spawn(config.install, { stdio: 'inherit', shell: true, cwd: path })
-        .on('error', reject)
-        .on('exit', function (code) {
-          if (code) reject('install command has failed')
-          else resolve()
-        })
-    }
+    spawn(config.install, { stdio: 'inherit', shell: true, cwd: path })
+      .on('error', reject)
+      .on('exit', function (code) {
+        if (code) reject('install command has failed')
+        else resolve()
+      })
   })
 }
 
