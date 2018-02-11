@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/gocli/go#readme",
   "dependencies": {
-    "go-loader-git": "^1.0.0",
+    "go-loader-git": "^2.0.0",
     "interpret": "1.1.0",
     "is-git-url": "1.0.0",
     "liftoff": "2.5.0",

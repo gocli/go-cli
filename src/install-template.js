@@ -15,7 +15,7 @@ const installTemplate = (path) =>
       try {
         fs.statSync(configPath + '.json')
       } catch (oO) {
-        return resolve(CONFIG_FILE + '(.json) not found')
+        return resolve()
       }
     }
 

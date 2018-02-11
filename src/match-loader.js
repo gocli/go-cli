@@ -3,17 +3,16 @@ import requireLoader, { normalizeName } from './require-loader'
 import isFunction from './is-function'
 import fail from './fail'
 import isGitUrl from 'is-git-url'
-import isRepoPath from './is-repo-path'
 
-const GIT_LOADER_NAME = 'git'
 const SEP = ':'
+const GIT_LOADER_NAME = 'git'
 
 const normalizeArgv = (argv) => {
   if (!argv._.length) return argv
 
   const command = argv._[0]
 
-  if (isGitUrl(command) || isRepoPath(command)) {
+  if (isGitUrl(command)) {
     return { ...argv, _: [GIT_LOADER_NAME].concat(argv._) }
   }
 
@@ -43,14 +42,13 @@ const matchLoader = (commandString, argv) =>
 
     const loaderExecutor = loader.execute || loader
 
-    const executor = () => {
-      Promise.resolve(loaderExecutor(argv))
+    const executor = () =>
+      Promise.resolve(loaderExecutor(commandString, argv))
         .then((result) => {
           const path = result && result.path
           if (!path || argv.install === false) return
           return installTemplate(path)
         })
-    }
 
     resolve(executor)
   })

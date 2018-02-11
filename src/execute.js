@@ -24,11 +24,12 @@ const execute = (args, env) => {
       matchBinary
     ]
 
-    return findExecutor(matchers, commandString, argv, env)
+    findExecutor(matchers, commandString, argv, env)
       .then((executor) => {
-        if (executor) return executor()
-        throw fail('Command not found')
+        if (executor) return resolve(executor())
+        throw fail('Command is not recognized')
       })
+      .catch(reject)
   })
 }
 

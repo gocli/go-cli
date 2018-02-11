@@ -5,10 +5,10 @@ import { STATUS_OK, STATUS_ERROR } from './process-statuses'
 const args = process.argv.slice(2)
 gocli(args)
   .then((message) => {
-    log(message)
+    if (message) log(message)
     process.exit(STATUS_OK)
   })
   .catch((error) => {
-    logError(error)
+    if (error) logError(error)
     process.exit(error.code || STATUS_ERROR)
   })

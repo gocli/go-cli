@@ -10,11 +10,15 @@ const matchBinary = (commandString) =>
     const bin = getExternalBinary()
     if (!bin) return resolve(null)
 
-    const executor = () => {
-      spawn(`${bin} ${commandString}`, { stdio: 'inherit', shell: true })
-        .on('error', (error) => reject(error))
-        .on('exit', (code) => reject(fail(null, code)))
-    }
+    const executor = () =>
+      new Promise((resolve, reject) => {
+        spawn(`${bin} ${commandString}`, { stdio: 'inherit', shell: true })
+          .on('error', (error) => reject(error))
+          .on('exit', (code) => {
+            if (code) reject(fail(null, code))
+            else resolve()
+          })
+      })
 
     resolve(executor)
   })
