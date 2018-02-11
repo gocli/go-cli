@@ -1,45 +1,35 @@
 import minimist from 'minimist'
-import log from './log'
-import exit, { ERROR } from './exit'
-import executeLoader from './execute-loader'
+import fail from './fail'
+import matchCommand from './match-command'
 import matchLoader from './match-loader'
-import getExternalBinary from './get-external-binary'
-import executeLocalCommand from './execute-local-command'
-import executeExternalBinary from './execute-external-binary'
-import loadGo from './load-go'
+import matchBinary from './match-binary'
+
+const findExecutor = (matchers, commandString, argv, env) => {
+  if (!matchers.length) return Promise.resolve(null)
+  return matchers[0](commandString, argv, env)
+    .then((executor) => {
+      if (executor) return executor
+      return findExecutor(matchers.slice(1), commandString, argv, env)
+    })
+}
 
 const execute = (args, env) => {
-  const argv = minimist(args)
+  return new Promise((resolve, reject) => {
+    const argv = minimist(args)
+    const commandString = args.join(' ')
 
-  if (matchLoader(argv)) {
-    return executeLoader(argv)
-  }
+    const matchers = [
+      matchCommand,
+      matchLoader,
+      matchBinary
+    ]
 
-  var command = args.join(' ')
-  if (env.configPath) {
-    if (!env.modulePath) {
-      if (getExternalBinary()) {
-        log('go package is not installed, falling back to next binary: ' + getExternalBinary())
-        executeExternalBinary(command)
-      } else {
-        exit('go package is not installed', ERROR)
-      }
-    } else {
-      var go = loadGo(env)
-      if (!go.validateCommand(command) && getExternalBinary()) {
-        log('command \'' + argv._[0] + '\' is not matched, falling back to next binary: ' + getExternalBinary())
-        executeExternalBinary(command)
-      } else {
-        executeLocalCommand(command, env)
-      }
-    }
-  } else {
-    if (getExternalBinary()) {
-      executeExternalBinary(command)
-    } else {
-      exit('Gofile is not found', ERROR)
-    }
-  }
+    return findExecutor(matchers, commandString, argv, env)
+      .then((executor) => {
+        if (executor) return executor()
+        throw fail('Command not found')
+      })
+  })
 }
 
 export default execute

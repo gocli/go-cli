@@ -1,10 +1,9 @@
 import resolveGlobal from 'resolve-global'
 
 const LOADER_PREFIX = 'go-loader-'
-const DEFAULT_LOADER_NAME = 'git'
 
 const normalizeName = (name) =>
-  LOADER_PREFIX + (name || DEFAULT_LOADER_NAME).toString().trim().toLowerCase()
+  LOADER_PREFIX + name.toString().trim().toLowerCase()
 
 const resolve = (name) => {
   name = normalizeName(name)

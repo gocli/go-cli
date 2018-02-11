@@ -1,31 +1,33 @@
 import fs from 'fs'
 import { resolve as resolvePath } from 'path'
 import { spawn } from 'child_process'
+import fail from './fail'
 
 const CONFIG_FILE = '.goconfig'
 
-const installTemplate = (path) => {
-  return new Promise(function (resolve, reject) {
-    var configPath = resolvePath('.', path, CONFIG_FILE)
+const installTemplate = (path) =>
+  new Promise((resolve, reject) => {
+    const configPath = resolvePath('.', path, CONFIG_FILE)
 
     try {
       fs.statSync(configPath)
     } catch (oO) {
       try {
         fs.statSync(configPath + '.json')
-      } catch (oO) { return resolve(CONFIG_FILE + '(.json) not found') }
+      } catch (oO) {
+        return resolve(CONFIG_FILE + '(.json) not found')
+      }
     }
 
-    var config = require(configPath)
+    const config = require(configPath)
     if (!config || !config.install) return resolve()
 
     spawn(config.install, { stdio: 'inherit', shell: true, cwd: path })
       .on('error', reject)
-      .on('exit', function (code) {
-        if (code) reject('install command has failed')
+      .on('exit', (code) => {
+        if (code) reject(fail('install command has failed', code))
         else resolve()
       })
   })
-}
 
 export default installTemplate
