@@ -1,4 +1,4 @@
-import minimist from 'minimist'
+import parse from './parse'
 import fail from './fail'
 import matchCommand from './match-command'
 import matchLoader from './match-loader'
@@ -15,7 +15,7 @@ const findExecutor = (matchers, commandString, argv, env) => {
 
 const execute = (args, env) => {
   return new Promise((resolve, reject) => {
-    const argv = minimist(args)
+    const argv = parse(args)
     const commandString = args.join(' ')
 
     const matchers = [

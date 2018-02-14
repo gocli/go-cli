@@ -1,11 +1,11 @@
 import Liftoff from 'liftoff'
-import minimist from 'minimist'
 import interpret from 'interpret'
 import execute from './execute'
+import parse from './parse'
 
 const gocli = (args) => {
   return new Promise((resolve, reject) => {
-    const argv = minimist(args)
+    const argv = parse(args)
 
     const Cli = new Liftoff({
       name: 'go',

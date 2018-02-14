@@ -16,13 +16,14 @@ const normalizeArgv = (argv) => {
     return { ...argv, _: [GIT_LOADER_NAME].concat(argv._) }
   }
 
-  const parts = command.split(SEP)
+  const sepIndex = command.indexOf(SEP)
+  const parts = ~sepIndex
+    ? [ command.slice(0, sepIndex), command.slice(sepIndex + 1) ]
+    : [ command ]
+
   return {
     ...argv,
-    _: [
-      parts[0],
-      parts.slice(1).join(SEP)
-    ].concat(argv._.slice(1))
+    _: parts.concat(argv._.slice(1))
   }
 }
 

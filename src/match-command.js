@@ -1,3 +1,5 @@
+import guide from './guide'
+
 const matchCommand = (commandString, argv, env) =>
   new Promise((resolve) => {
     if (!env.configPath || !env.modulePath) {
@@ -8,14 +10,17 @@ const matchCommand = (commandString, argv, env) =>
     // initialize local Gofile
     require(env.configPath)
 
+    if (!argv._.length && go.getCommands().length) {
+      const executor = () =>
+        guide(go.getCommands()).then(go.executeCommand)
+      return resolve(executor)
+    }
+
     if (!go.validateCommand(commandString)) {
-      // log('command \'' + argv._[0] + '\' is not matched, falling back to next binary: ')
       return resolve(null)
     }
 
-    const executor = () => go.executeCommand(commandString)
-
-    resolve(executor)
+    resolve(() => go.executeCommand(commandString))
   })
 
 export default matchCommand
