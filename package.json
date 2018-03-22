@@ -2,6 +2,7 @@
   "name": "go-cli",
   "version": "1.0.0-rc.5",
   "description": "Create, install and use boilerplates with ease",
+  "main": "./lib",
   "bin": {
     "go": "bin/go.js"
   },
@@ -10,6 +11,9 @@
     "test": "standard -v | snazzy",
     "build": "rollup -c",
     "prepublishOnly": "npm run test && npm run build"
+  },
+  "engines": {
+    "node": ">=6.4.0"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
 
-process.title = 'go'
-require('../bundle.js')
+const go = require('..')
+const args = process.argv.slice(2)
+go(args).catch(console.error)
