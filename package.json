@@ -7,7 +7,11 @@
     "go": "bin/go.js"
   },
   "scripts": {
-    "test": "standard -v | snazzy",
+    "lint": "standard -v | snazzy",
+    "unit": "jest --coverage",
+    "unit:watch": "jest --coverage --watchAll",
+    "coverage": "npm run unit; opn coverage/lcov-report/index.html",
+    "test": "npm run lint && npm run unit",
     "prepublishOnly": "npm run test"
   },
   "engines": {
@@ -28,6 +32,10 @@
   ],
   "author": "Stanislav Termosa <termosa.stanislav@gmail.com> (https://github.com/termosa)",
   "license": "MIT",
+  "files": [
+    "bin",
+    "lib"
+  ],
   "bugs": {
     "url": "https://github.com/gocli/go/issues"
   },
@@ -37,14 +45,22 @@
     "go-loader-git": "file:../dist/go-loader-git.tgz",
     "inquirer": "5.1.0",
     "interpret": "1.1.0",
-    "is-git-url": "1.0.0",
     "liftoff": "2.5.0",
     "minimist": "1.2.0",
     "resolve-global": "0.1.0",
     "which": "1.3.0"
   },
   "devDependencies": {
-    "snazzy": "^7.0.0",
-    "standard": "^10.0.3"
+    "jest": "^22.4.2",
+    "opn-cli": "^3.1.0",
+    "snazzy": "^7.1.1",
+    "standard": "^11.0.0"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "expect",
+      "it"
+    ]
   }
 }
