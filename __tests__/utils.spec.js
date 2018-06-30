@@ -6,7 +6,6 @@ jest.mock('resolve-global', () => mockResolveGlobal)
 const { normalizeLoaderName, requireLoader } = require('../lib/utils')
 
 describe('Utils', () => {
-
   beforeEach(() => {
     mockResolveGlobal.dependency = null
   })
