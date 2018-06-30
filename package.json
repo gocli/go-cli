@@ -34,7 +34,7 @@
   "homepage": "https://github.com/gocli/go#readme",
   "dependencies": {
     "chalk": "2.3.1",
-    "go-loader-git": "^2.0.0",
+    "go-loader-git": "file:../dist/go-loader-git.tgz",
     "inquirer": "5.1.0",
     "interpret": "1.1.0",
     "is-git-url": "1.0.0",
