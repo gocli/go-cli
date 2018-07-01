@@ -5,6 +5,13 @@ const mockInquirer = (() => {
   return inquirer
 })()
 jest.mock('inquirer', () => mockInquirer)
+
+const mockChalkFormatter = str => str
+jest.mock('chalk', () => ({
+  blueBright: mockChalkFormatter,
+  gray: mockChalkFormatter
+}))
+
 const guide = require('../lib/guide')
 
 const commands = [
@@ -56,7 +63,7 @@ describe('Guide', () => {
           name: 'command',
           message: 'Choose command:',
           type: 'list',
-          prefix: '\u001b[94m[GO]\u001b[39m',
+          prefix: '[GO]',
           choices: [
             {
               disabled: false,
@@ -84,7 +91,7 @@ describe('Guide', () => {
             },
             {
               disabled: true,
-              name: 'name 2\u001b[90m — desc 2\u001b[39m',
+              name: 'name 2 — desc 2',
               short: 'name 2',
               value: {
                 name: 'name 2',
@@ -99,7 +106,7 @@ describe('Guide', () => {
           name: 'command',
           message: 'Choose command:',
           type: 'list',
-          prefix: '\u001b[94m[NAME 0]\u001b[39m',
+          prefix: '[NAME 0]',
           choices: [
             {
               disabled: false,
@@ -126,7 +133,7 @@ describe('Guide', () => {
           name: 'command',
           message: 'deep',
           type: 'list',
-          prefix: '\u001b[94m[NAME 0.1]\u001b[39m',
+          prefix: '[NAME 0.1]',
           choices: [
             {
               disabled: false,
