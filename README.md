@@ -1,4 +1,4 @@
-# go-cli [![npm](https://img.shields.io/npm/v/go-cli.svg?style=flat-square)](https://www.npmjs.com/package/go-cli) [![Travis](https://img.shields.io/travis/gocli/go-cli.svg?style=flat-square)](https://travis-ci.org/gocli/go-cli) [![Coveralls](https://img.shields.io/coveralls/github/gocli/go-cli.svg?style=flat-square)](https://coveralls.io/github/gocli/go-cli)
+# go-cli [![npm](https://img.shields.io/npm/v/go-cli.svg?style=flat-square)](https://www.npmjs.com/package/go-cli) [![Travis](https://img.shields.io/travis/gocli/go-cli.svg?style=flat-square)](https://travis-ci.org/gocli/go-cli) [![Coveralls](https://img.shields.io/coveralls/github/gocli/go-cli.svg?style=flat-square)](https://coveralls.io/github/gocli/go-cli) [![Known Vulnerabilities](https://snyk.io/test/github/gocli/go-cli/badge.svg?style=flat-square)](https://snyk.io/test/github/gocli/go-cli) [![js-standard-style](https://img.shields.io/badge/code%20style-standard-green.svg?style=flat-square)](https://github.com/gocli/go-cli)
 
 The CLI tool to use boilerplates made with [go](https://www.npmjs.com/package/go)
 
