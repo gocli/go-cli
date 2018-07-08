@@ -70,7 +70,7 @@ describe('Install package', () => {
 
     setTimeout(() => ee.emit('exit', 42))
     return expect(installPackage('./__tests__/data/install-package-js-install'))
-      .rejects.toThrow('install command has failed with code 42')
+      .rejects.toThrow('install command has failed')
   })
 
   it('rejects if spawned script emits error', () => {

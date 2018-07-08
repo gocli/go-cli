@@ -65,7 +65,7 @@ describe('Match Binary', () => {
     mockSpawn.mockReturnValue(ee)
     setTimeout(() => ee.emit('exit', 1))
     return matchBinary(args)
-      .then((executor) => expect(executor()).rejects.toThrow('Resolved with status 1'))
+      .then((executor) => expect(executor()).rejects.toThrow())
   })
 
   it('rejects if process sends the error', () => {
