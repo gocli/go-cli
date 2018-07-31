@@ -22,7 +22,7 @@ describe('Match Command', () => {
 
   beforeEach(() => {
     mockGuide.mockReset()
-    mockGuide.mockResolvedValue(42)
+    mockGuide.mockResolvedValue({ name: 'cmd', callback: jest.fn() })
 
     mockModule.getCommands.mockReset()
     mockModule.getCommands.mockReturnValue(localCommands)
@@ -62,15 +62,29 @@ describe('Match Command', () => {
       })
   })
 
-  it('executes command, resolved by guide, using go.executeCommand', () => {
+  it('executes command, resolved by guide', () => {
+    const callback = jest.fn()
     return matchCommand([], env)
       .then((executor) => {
-        mockGuide.mockResolvedValue('test command')
+        mockGuide.mockResolvedValue({ name: 'cmd', callback })
         return executor()
       })
       .then(() => {
-        expect(mockModule.executeCommand).toHaveBeenCalledTimes(1)
-        expect(mockModule.executeCommand).toHaveBeenCalledWith('test command')
+        expect(callback).toHaveBeenCalledTimes(1)
+        expect(callback).toHaveBeenLastCalledWith({ args: { _: ['cmd'] } })
+      })
+  })
+
+  it('executes nested command, resolved by guide, with proper arguments', () => {
+    const callback = jest.fn()
+    return matchCommand([], env)
+      .then((executor) => {
+        mockGuide.mockResolvedValue({ name: 'child', callback, parent: { name: 'parent' } })
+        return executor()
+      })
+      .then(() => {
+        expect(callback).toHaveBeenCalledTimes(1)
+        expect(callback).toHaveBeenLastCalledWith({ args: { _: ['parent', 'child'] } })
       })
   })
 
@@ -94,7 +108,7 @@ describe('Match Command', () => {
 
   it('calls go.executeCommand with matched command', () => {
     mockModule.matchCommand.mockReturnValue(matchedCommand)
-    return matchCommand(command, env)
+    return matchCommand(matchedCommand.split(' '), env)
       .then((executor) => {
         executor()
         expect(mockModule.executeCommand).toHaveBeenCalledTimes(1)

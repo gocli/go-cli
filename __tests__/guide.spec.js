@@ -14,7 +14,7 @@ jest.mock('chalk', () => ({
 
 const guide = require('../lib/guide')
 
-const commands = [
+const commands = [ // links to parent commands are droped
   {
     name: 'name 0',
     commands: [
@@ -143,6 +143,17 @@ describe('Guide', () => {
             }
           ]
         })
+      })
+  })
+
+  it('resolves with a matched command', () => {
+    mockInquirer.prompt.mockReset()
+    mockInquirer.prompt.mockImplementation(([ command ]) => {
+      return Promise.resolve({ command: command.choices[0].value })
+    })
+    return guide(commands)
+      .then(command => {
+        expect(command).toEqual(commands[0].commands[0].commands[0])
       })
   })
 })
