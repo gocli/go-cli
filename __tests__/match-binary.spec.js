@@ -10,12 +10,19 @@ describe('Match Binary', () => {
   const args = ['the', 'command']
   const jsBin = '/bin/node/go'
   const goBin = '/bin/go'
+  const processArgv = process.argv
 
   beforeEach(() => {
     mockWhichSync.mockReset()
     mockWhichSync.mockReturnValue([jsBin, goBin])
 
     mockSpawn.mockReset()
+
+    process.argv = ['/bin/node', jsBin]
+  })
+
+  afterEach(() => {
+    process.argv = processArgv
   })
 
   it('calls which.sync with flag all set to true', () => {
@@ -26,8 +33,29 @@ describe('Match Binary', () => {
   })
 
   it('resolves with null if extra binary not found', () => {
+    mockWhichSync.mockReturnValue(undefined)
+    return expect(matchBinary(args)).resolves.toBe(null)
+  })
+
+  it('resolves with null if which returns no binaries', () => {
     mockWhichSync.mockReturnValue([jsBin])
     return expect(matchBinary(args)).resolves.toBe(null)
+  })
+
+  it('resolves with binary if it is different from the runned one', () => {
+    const ee = new EventEmitter()
+    mockWhichSync.mockReturnValue([goBin])
+    mockSpawn.mockReturnValue(ee)
+    setTimeout(() => ee.emit('exit', 0))
+    return matchBinary(args)
+      .then((executor) => executor())
+      .then(() => {
+        expect(mockSpawn).toHaveBeenCalledTimes(1)
+        expect(mockSpawn).toHaveBeenCalledWith(`${goBin} the command`, {
+          stdio: 'inherit',
+          shell: true
+        })
+      })
   })
 
   it('resolves with executor function if extra binary is found', () => {
