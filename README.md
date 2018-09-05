@@ -18,10 +18,15 @@ Go can be used in 2 ways:
 
 ```bash
 $ npm install --global go
-$ go git git@github.com:gocli/boilerplate-example.git
+$ go gocli/boilerplate-example
 ```
 
+This download [https://github.com/gocli/boilerplate-example](https://github.com/gocli/boilerplate-example) and runs install script.
+
 To create and use your own boilerplates, refer to [documentation](http://gocli.io) or check the list of [community driven boilerplates](http://gocli.io/boilerplates).
+
+Go uses [Loaders](http://gocli.io/#what-is-loader) to download sources.
+You are able to [create your own Loaders](http://gocli.io/#creating-loaders) if you need.
 
 ### Run local commands
 
