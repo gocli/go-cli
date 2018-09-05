@@ -105,4 +105,48 @@ describe('Match Loader', () => {
     return matchLoader(args, genEnv())
       .then((executor) => expect(executor()).rejects.toThrow('install fails'))
   })
+
+  it('matches git shortcut', () => {
+    const env = genEnv()
+    const gitLink = 'git@github.com:user/repo.git'
+    return matchLoader([gitLink], env)
+      .then((executor) => executor())
+      .then(() => {
+        expect(mockLoader.execute).toHaveBeenCalledTimes(1)
+        expect(mockLoader.execute).toHaveBeenCalledWith({ args: ['git', gitLink], env })
+      })
+  })
+
+  it('matches git shortcut with https link', () => {
+    const env = genEnv()
+    const gitLink = 'https://github.com/user/repo.git'
+    return matchLoader([gitLink], env)
+      .then((executor) => executor())
+      .then(() => {
+        expect(mockLoader.execute).toHaveBeenCalledTimes(1)
+        expect(mockLoader.execute).toHaveBeenCalledWith({ args: ['git', gitLink], env })
+      })
+  })
+
+  it('matches github shortcut', () => {
+    const env = genEnv()
+    const githubPath = 'user/repo'
+    return matchLoader([githubPath], env)
+      .then((executor) => executor())
+      .then(() => {
+        expect(mockLoader.execute).toHaveBeenCalledTimes(1)
+        expect(mockLoader.execute).toHaveBeenCalledWith({ args: ['github', githubPath], env })
+      })
+  })
+
+  it('matches github shortcut with ref name', () => {
+    const env = genEnv()
+    const githubPath = 'user/repo:ref'
+    return matchLoader([githubPath], env)
+      .then((executor) => executor())
+      .then(() => {
+        expect(mockLoader.execute).toHaveBeenCalledTimes(1)
+        expect(mockLoader.execute).toHaveBeenCalledWith({ args: ['github', githubPath], env })
+      })
+  })
 })
