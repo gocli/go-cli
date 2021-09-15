@@ -48,7 +48,7 @@
     "go-loader-gist": "^0.1.0",
     "go-loader-git": "^3.0.3",
     "go-loader-github": "0.0.4",
-    "inquirer": "5.1.0",
+    "inquirer": "7.0.5",
     "interpret": "1.1.0",
     "liftoff": "2.5.0",
     "minimist": "1.2.0",
