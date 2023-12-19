@@ -50,7 +50,7 @@
     "go-loader-github": "0.0.4",
     "inquirer": "5.1.0",
     "interpret": "1.1.0",
-    "liftoff": "2.5.0",
+    "liftoff": "4.0.0",
     "minimist": "1.2.0",
     "resolve-global": "0.1.0",
     "which": "1.3.0"
